@@ -1,0 +1,51 @@
+<div class="panel">
+  {% if warning %}<div class="warning">{{ warning }}</div>{% endif %}
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+  {% if job_id and not error %}
+    <h2>Listo</h2>
+    <p>Se generaron {{ images|length }} imagen{% if images|length != 1 %}es{% endif %} cuadrada{% if images|length != 1 %}s{% endif %} y un caption.</p>
+
+    <div class="actions">
+      <a class="button" href="{{ download_all_url }}">Descargar todo en ZIP</a>
+    </div>
+
+    <h3>Caption</h3>
+    <div class="caption">{{ caption }}</div>
+
+    {% if publish_result or publish_error %}
+      <div id="publish-status">
+        {% include "partials/publish_status.html" %}
+      </div>
+    {% else %}
+      <div id="publish-status"></div>
+    {% endif %}
+
+    <form class="inline-form" hx-post="/publish" hx-target="#publish-status" hx-swap="innerHTML" hx-indicator="#publish-indicator">
+      <input type="hidden" name="job_id" value="{{ job_id }}">
+
+      <h3>Orden del carrusel</h3>
+      <p class="hint">Arrastra las imágenes para ordenar el carrusel antes de publicarlo.</p>
+
+      <div class="grid sortable" data-sortable>
+        {% for image in images %}
+          <figure class="sortable-item" draggable="true">
+            <input type="hidden" name="image_order" value="{{ image.filename }}">
+            <img src="{{ image.url }}" alt="Imagen generada para Instagram {{ loop.index }}">
+            <figcaption>
+              <span class="order-label">{{ loop.index }}</span>
+              <a href="{{ image.download_url }}">Descargar {{ image.filename }}</a>
+            </figcaption>
+          </figure>
+        {% endfor %}
+      </div>
+
+      <button type="submit">Publicar en Instagram</button>
+      <span id="publish-indicator" class="htmx-indicator loading" data-loading-status data-stages="Preparando publicación|Subiendo imágenes a Instagram|Creando publicación|Publicando en Instagram">
+        <span class="spinner" aria-hidden="true"></span>
+        <span data-stage>Preparando…</span>
+        <span class="elapsed" data-elapsed>0s</span>
+      </span>
+    </form>
+  {% endif %}
+</div>

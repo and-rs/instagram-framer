@@ -1,0 +1,10 @@
+{% if publish_error %}
+  <div class="error">{{ publish_error }}</div>
+{% elif publish_result %}
+  <div class="success">
+    Publicado en Instagram. ID: {{ publish_result.id }}
+    {% if publish_result.permalink %}<br><a href="{{ publish_result.permalink }}" target="_blank" rel="noreferrer">Abrir publicación</a>{% endif %}
+  </div>
+{% else %}
+  <div>Publicando…</div>
+{% endif %}

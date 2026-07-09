@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Enmarcador para Instagram</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', path='favicon/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', path='favicon/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', path='favicon/favicon-16x16.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', path='favicon/favicon.ico') }}">
+    <link rel="manifest" href="{{ url_for('static', path='favicon/site.webmanifest') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="{{ url_for('static', path='app.js') }}" defer></script>
+  </head>
+  <body>
+    <main>
+      <h1>Enmarcador para Instagram</h1>
+      <p class="lede">Sube fotos de obras, genera imágenes cuadradas, crea un caption en español y descarga o publica el carrusel.</p>
+
+      <form hx-post="/process" hx-encoding="multipart/form-data" hx-target="#result" hx-swap="innerHTML" hx-indicator="#process-indicator">
+        <label>
+          Imágenes
+          <input type="file" name="images" accept="image/*" multiple required>
+          <span class="hint">Hasta {{ max_upload_count }} imágenes, {{ max_upload_mb }} MB cada una.</span>
+        </label>
+        <label>
+          Título de la obra
+          <input type="text" name="title" placeholder="Opcional">
+        </label>
+        <label>
+          Técnica / material
+          <input type="text" name="material" placeholder="Acrílico sobre retablo" required>
+        </label>
+        <label>
+          Medidas
+          <input type="text" name="size" placeholder="35 × 25 cm" required>
+        </label>
+        <label>
+          Notas
+          <textarea name="notes" placeholder="Contexto opcional para el caption"></textarea>
+        </label>
+        <button type="submit">Procesar imágenes</button>
+        <span id="process-indicator" class="htmx-indicator loading" data-loading-status data-stages="Subiendo imágenes|Enmarcando y optimizando|Generando caption|Preparando descarga">
+          <span class="spinner" aria-hidden="true"></span>
+          <span data-stage>Preparando…</span>
+          <span class="elapsed" data-elapsed>0s</span>
+        </span>
+      </form>
+
+      <section id="result"></section>
+    </main>
+  </body>
+</html>
