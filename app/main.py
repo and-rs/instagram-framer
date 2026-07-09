@@ -106,12 +106,8 @@ async def process(
 
 
 @app.post("/publish", response_class=HTMLResponse)
-async def publish(
-    request: Request,
-    job_id: Annotated[str, Form()],
-    image_order: Annotated[list[str] | None, Form()] = None,
-):
-    publish_result, publish_error = await _publish_job(request, job_id, image_order)
+async def publish(request: Request, job_id: Annotated[str, Form()]):
+    publish_result, publish_error = await _publish_job(request, job_id)
     return templates.TemplateResponse(
         request=request,
         name="partials/publish_status.html",
@@ -197,39 +193,21 @@ def _result(
     )
 
 
-async def _publish_job(
-    request: Request,
-    job_id: str,
-    image_order: list[str] | None = None,
-) -> tuple[dict | None, str | None]:
+async def _publish_job(request: Request, job_id: str) -> tuple[dict | None, str | None]:
     job = jobs.get(job_id)
     if not job:
         return None, "El trabajo no existe o expiró. Procesa las imágenes nuevamente."
 
-    filenames, error = _ordered_filenames(job["filenames"], image_order)
-    if error:
-        return None, error
-
     base_url = (settings.public_base_url or str(request.base_url)).rstrip("/")
     image_urls = [
         f"{base_url}{request.url_for('generated', job_id=job_id, filename=filename).path}"
-        for filename in filenames
+        for filename in job["filenames"]
     ]
 
     try:
         return await publish_carousel(image_urls, job["caption"]), None
     except InstagramError as exc:
         return None, str(exc)
-
-
-def _ordered_filenames(original: list[str], requested: list[str] | None) -> tuple[list[str], str | None]:
-    if not requested:
-        return original, None
-    if len(requested) != len(original) or set(requested) != set(original):
-        return original, "El orden del carrusel no coincide con las imágenes generadas. Actualiza la página o procesa nuevamente."
-    if any(not _safe_filename(filename) for filename in requested):
-        return original, "El orden del carrusel contiene un archivo inválido."
-    return requested, None
 
 
 def _generated_image_path(job_id: str, filename: str) -> Path:

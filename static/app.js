@@ -41,57 +41,6 @@ function stopLoader(indicator) {
   activeLoaders.delete(indicator);
 }
 
-function updateOrderLabels(container) {
-  container.querySelectorAll(".order-label").forEach((label, index) => {
-    label.textContent = String(index + 1);
-  });
-}
-
-function itemAfterPointer(container, y) {
-  const items = [...container.querySelectorAll(".sortable-item:not(.dragging)")];
-  return items.reduce(
-    (closest, item) => {
-      const box = item.getBoundingClientRect();
-      const offset = y - box.top - box.height / 2;
-      if (offset < 0 && offset > closest.offset) return { offset, item };
-      return closest;
-    },
-    { offset: Number.NEGATIVE_INFINITY, item: null },
-  ).item;
-}
-
-function setupSortable(container) {
-  if (container.dataset.sortableReady === "true") return;
-  container.dataset.sortableReady = "true";
-
-  container.addEventListener("dragstart", (event) => {
-    const item = event.target.closest(".sortable-item");
-    if (!item) return;
-    item.classList.add("dragging");
-    event.dataTransfer.effectAllowed = "move";
-  });
-
-  container.addEventListener("dragend", (event) => {
-    const item = event.target.closest(".sortable-item");
-    if (item) item.classList.remove("dragging");
-    updateOrderLabels(container);
-  });
-
-  container.addEventListener("dragover", (event) => {
-    event.preventDefault();
-    const dragging = container.querySelector(".dragging");
-    if (!dragging) return;
-    const after = itemAfterPointer(container, event.clientY);
-    if (after) container.insertBefore(dragging, after);
-    else container.appendChild(dragging);
-    updateOrderLabels(container);
-  });
-}
-
-function setupSortables(root = document) {
-  root.querySelectorAll("[data-sortable]").forEach(setupSortable);
-}
-
 document.body.addEventListener("htmx:beforeRequest", (event) => {
   startLoader(resolveIndicator(event.detail.elt));
 });
@@ -107,9 +56,3 @@ document.body.addEventListener("htmx:sendError", (event) => {
 document.body.addEventListener("htmx:responseError", (event) => {
   stopLoader(resolveIndicator(event.detail.elt));
 });
-
-document.body.addEventListener("htmx:afterSwap", (event) => {
-  setupSortables(event.target);
-});
-
-document.addEventListener("DOMContentLoaded", () => setupSortables());

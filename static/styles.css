@@ -105,27 +105,6 @@ button:hover, .button:hover {
   margin: 0;
 }
 
-.sortable-item {
-  cursor: grab;
-}
-
-.sortable-item.dragging {
-  opacity: 0.45;
-}
-
-.order-label {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #26231f;
-  color: white;
-  font-size: 0.85rem;
-  margin-right: 8px;
-}
-
 .grid img {
   width: 100%;
   border-radius: 12px;

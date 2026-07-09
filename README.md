@@ -1,29 +1,28 @@
-# Enmarcador para Instagram
+# Instagram Framer
 
-App FastAPI + HTMX para preparar publicaciones de obras de arte para Instagram.
+FastAPI + HTMX app for preparing artwork posts for Instagram.
 
-## Uso local
+## Local usage
 
 ```bash
 just start
 ```
 
-Abrir:
+Open:
 
 ```text
 http://127.0.0.1:8000
 ```
 
-## Flujo
+## Flow
 
-1. Subir imágenes de la obra.
-2. Indicar técnica/material y medidas.
-3. Generar imágenes cuadradas `2000x2000` y un caption en español.
-4. Revisar el preview.
-5. Reordenar las imágenes del carrusel arrastrándolas.
-6. Descargar el ZIP o publicar manualmente en Instagram.
+1. Upload artwork images.
+2. Enter technique/material and dimensions.
+3. Generate `2000x2000` square images and a Spanish caption.
+4. Review the generated images and caption.
+5. Download the ZIP or manually publish to Instagram.
 
-## Variables de entorno
+## Environment variables
 
 ```text
 OPENAI_API_KEY=...
@@ -39,9 +38,9 @@ MAX_OUTPUT_MB=8
 GENERATED_TTL_SECONDS=3600
 ```
 
-`PUBLIC_BASE_URL` debe ser una URL pública para que Instagram pueda descargar las imágenes generadas.
+`PUBLIC_BASE_URL` must be publicly reachable so Instagram can fetch generated images.
 
-## Comandos
+## Commands
 
 ```bash
 just start
@@ -51,8 +50,9 @@ just check
 
 ## TODO
 
-- Probar publicación real con credenciales finales de Instagram/Meta.
-- Confirmar permisos requeridos en Meta App Review para la cuenta final.
-- Mejorar persistencia de trabajos si la app se usa con múltiples instancias o reinicios.
-- Considerar S3/R2 si Instagram no descarga de forma confiable desde almacenamiento temporal local.
-- Añadir edición manual del caption antes de publicar.
+- [ ] Test end-to-end publishing with final Instagram/Meta credentials.
+- [ ] Confirm required Meta App Review permissions for the final account.
+- [ ] Improve job persistence if the app is used with multiple instances or restarts.
+- [ ] Consider S3/R2 if Instagram cannot reliably fetch temporary local files.
+- [ ] Add manual caption editing before publishing.
+- [ ] Revisit carousel ordering UX later.
