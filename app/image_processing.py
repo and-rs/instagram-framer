@@ -25,7 +25,9 @@ def _load_image(data: bytes) -> Image.Image:
         raise ImageProcessingError("El archivo subido no es una imagen válida") from exc
 
 
-def _flatten(image: Image.Image, background: tuple[int, int, int] = (255, 255, 255)) -> Image.Image:
+def _flatten(
+    image: Image.Image, background: tuple[int, int, int] = (255, 255, 255)
+) -> Image.Image:
     canvas = Image.new("RGBA", image.size, background + (255,))
     canvas.alpha_composite(image)
     return canvas.convert("RGB")
@@ -37,11 +39,13 @@ def frame_image_bytes(data: bytes, output_path: Path) -> Path:
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     if width == height:
-        result = _flatten(image).resize((OUTPUT_SIZE, OUTPUT_SIZE), Image.Resampling.LANCZOS)
+        result = _flatten(image).resize(
+            (OUTPUT_SIZE, OUTPUT_SIZE), Image.Resampling.LANCZOS
+        )
         _save_jpeg(result, output_path)
         return output_path
 
-    max_side = int(OUTPUT_SIZE * 0.84)
+    max_side = int(OUTPUT_SIZE * 0.90)
     framed = Image.new("RGB", (OUTPUT_SIZE, OUTPUT_SIZE), _frame_background())
     work = image.copy()
     work.thumbnail((max_side, max_side), Image.Resampling.LANCZOS)
@@ -86,11 +90,13 @@ def _save_jpeg(image: Image.Image, output_path: Path) -> None:
 
 
 def _frame_background() -> tuple[int, int, int]:
-    color = settings.frame_background.strip().strip('"\'')
+    color = settings.frame_background.strip().strip("\"'")
     if len(color) in (3, 6) and all(char in "0123456789abcdefABCDEF" for char in color):
         color = f"#{color}"
 
     try:
         return ImageColor.getrgb(color)
     except ValueError as exc:
-        raise ImageProcessingError("FRAME_BACKGROUND debe ser un color CSS válido, por ejemplo #f7f3ea") from exc
+        raise ImageProcessingError(
+            "FRAME_BACKGROUND debe ser un color CSS válido, por ejemplo #f7f3ea"
+        ) from exc
