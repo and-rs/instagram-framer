@@ -14,8 +14,10 @@ from fastapi.templating import Jinja2Templates
 from app.captioning import generate_caption
 from app.config import settings
 from app.image_processing import ImageProcessingError, frame_image_bytes
+from app.scene import router as scene_router
 
 app = FastAPI()
+app.include_router(scene_router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
@@ -26,8 +28,12 @@ jobs: dict[str, dict] = {}
 async def index(request: Request):
     return templates.TemplateResponse(
         request=request,
-        name="index.html",
-        context={"max_upload_mb": settings.max_upload_mb, "max_upload_count": settings.max_upload_count},
+        name="index.jinja",
+        context={
+            "active_page": "home",
+            "max_upload_mb": settings.max_upload_mb,
+            "max_upload_count": settings.max_upload_count,
+        },
     )
 
 
@@ -166,7 +172,7 @@ def _result(
         ]
     return templates.TemplateResponse(
         request=request,
-        name="partials/result.html",
+        name="partials/result.jinja",
         context={
             "job_id": job_id or "",
             "images": image_items,

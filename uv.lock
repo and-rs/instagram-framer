@@ -104,6 +104,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "httpx" },
     { name = "pytest" },
 ]
 
@@ -119,7 +120,10 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "pytest" }]
+dev = [
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "pytest" },
+]
 
 [[package]]
 name = "h11"

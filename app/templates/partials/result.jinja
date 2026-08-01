@@ -1,0 +1,39 @@
+<div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    {% if warning %}
+        <div class="mb-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{{ warning }}</div>
+    {% endif %}
+    {% if error %}
+        <div class="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">{{ error }}</div>
+    {% endif %}
+    {% if job_id and not error %}
+        <h2 class="text-xl font-semibold">Listo</h2>
+        <p class="mt-2 text-sm text-slate-600">
+            Se generaron {{ images|length }} imagen
+            {% if images|length != 1 %}es{% endif %}
+            cuadrada
+            {% if images|length != 1 %}s{% endif %}
+            y un caption.
+        </p>
+        <div class="mt-5">
+            <a class="inline-flex items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-slate-800"
+               href="{{ download_all_url }}">Descargar todo en ZIP</a>
+        </div>
+        <h3 class="mt-6 text-sm font-semibold">Caption</h3>
+        <div class="mt-2 rounded-md border border-slate-200 bg-slate-50 p-4 text-sm leading-6 whitespace-pre-wrap text-slate-700">
+            {{ caption }}
+        </div>
+        <div class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {% for image in images %}
+                <figure class="overflow-hidden rounded-lg border border-slate-200">
+                    <img class="aspect-square w-full object-cover"
+                         src="{{ image.url }}"
+                         alt="Imagen generada {{ loop.index }}">
+                    <figcaption class="p-3 text-sm">
+                        <a class="font-medium text-slate-700 underline underline-offset-4 hover:text-slate-950"
+                           href="{{ image.download_url }}">Descargar {{ image.filename }}</a>
+                    </figcaption>
+                </figure>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

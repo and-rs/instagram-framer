@@ -1,0 +1,74 @@
+{% extends "base.jinja" %}
+{% block head %}
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="{{ url_for("static", path = "app.js") }}" defer></script>
+{% endblock %}
+{% block content %}
+    <div class="max-w-2xl">
+        <h1 class="text-4xl font-semibold tracking-tight sm:text-5xl">Enmarcador para Instagram</h1>
+        <p class="mt-4 text-base leading-7 text-slate-600">
+            Sube fotos de obras, genera imágenes cuadradas, crea un caption en español y descarga el resultado.
+        </p>
+    </div>
+    <form class="mt-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+          hx-post="/process"
+          hx-encoding="multipart/form-data"
+          hx-target="#result"
+          hx-swap="innerHTML"
+          hx-indicator="#process-indicator">
+        <label class="mb-5 grid gap-2 text-sm font-medium">
+            Imágenes
+            <input class="block w-full cursor-pointer rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 file:mr-4 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200"
+                   type="file"
+                   name="images"
+                   accept="image/*"
+                   multiple
+                   required>
+            <span class="text-sm font-normal text-slate-500">Hasta {{ max_upload_count }} imágenes, {{ max_upload_mb }} MB cada una.</span>
+        </label>
+        <label class="mb-5 grid gap-2 text-sm font-medium">
+            Título de la obra
+            <input class="rounded-md border border-slate-200 px-3 py-2 text-sm shadow-sm outline-none placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                   type="text"
+                   name="title"
+                   placeholder="Opcional">
+        </label>
+        <label class="mb-5 grid gap-2 text-sm font-medium">
+            Técnica / material
+            <input class="rounded-md border border-slate-200 px-3 py-2 text-sm shadow-sm outline-none placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                   type="text"
+                   name="material"
+                   placeholder="Acrílico sobre retablo"
+                   required>
+        </label>
+        <label class="mb-5 grid gap-2 text-sm font-medium">
+            Medidas
+            <input class="rounded-md border border-slate-200 px-3 py-2 text-sm shadow-sm outline-none placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                   type="text"
+                   name="size"
+                   placeholder="35 × 25 cm"
+                   required>
+        </label>
+        <label class="mb-6 grid gap-2 text-sm font-medium">
+            Notas
+            <textarea class="min-h-24 resize-y rounded-md border border-slate-200 px-3 py-2 text-sm shadow-sm outline-none placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                      name="notes"
+                      placeholder="Contexto opcional para el caption"></textarea>
+        </label>
+        <div class="flex flex-wrap items-center gap-3">
+            <button class="inline-flex items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+                    type="submit">Procesar imágenes</button>
+            <span id="process-indicator"
+                  class="htmx-indicator inline-flex items-center gap-2 text-sm text-slate-500 transition-opacity"
+                  data-loading-status
+                  data-stages="Subiendo imágenes|Enmarcando y optimizando|Generando caption|Preparando descarga">
+                <span class="size-4 animate-spin rounded-full border-2 border-slate-200 border-t-slate-700"
+                      aria-hidden="true"></span>
+                <span data-stage>Preparando…</span>
+                <span class="font-mono text-xs text-slate-400" data-elapsed>0s</span>
+            </span>
+        </div>
+    </form>
+    <section id="result" class="mt-7">
+    </section>
+{% endblock %}

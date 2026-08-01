@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>
+            {% block title %}Enmarcador para Instagram{% endblock %}
+        </title>
+        <link rel="apple-touch-icon"
+              sizes="180x180"
+              href="{{ url_for('static', path='favicon/apple-touch-icon.png') }}">
+        <link rel="icon"
+              type="image/png"
+              sizes="32x32"
+              href="{{ url_for('static', path='favicon/favicon-32x32.png') }}">
+        <link rel="icon"
+              type="image/png"
+              sizes="16x16"
+              href="{{ url_for('static', path='favicon/favicon-16x16.png') }}">
+        <link rel="shortcut icon"
+              href="{{ url_for('static', path='favicon/favicon.ico') }}">
+        <link rel="manifest"
+              href="{{ url_for('static', path='favicon/site.webmanifest') }}">
+        <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+        {% block head %}{% endblock %}
+    </head>
+    <body class="min-h-screen bg-stone-50 font-sans text-slate-950 antialiased">
+        <header class="border-b border-slate-200 bg-white/80 backdrop-blur">
+            <nav class="mx-auto flex min-h-16 w-full max-w-5xl items-center justify-between px-4"
+                 aria-label="Principal">
+                <a class="text-base font-semibold tracking-tight" href="/">Framer</a>
+                <div class="flex items-center gap-1">
+                    <a class="rounded-md px-3 py-2 text-sm font-medium transition-colors {% if active_page == 'home' %}bg-slate-900 text-white{% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-950{% endif %}"
+                       href="/"
+                       {% if active_page == 'home' %}aria-current="page"{% endif %}>Inicio</a>
+                    <a class="rounded-md px-3 py-2 text-sm font-medium transition-colors {% if active_page == 'scene' %}bg-slate-900 text-white{% else %}text-slate-600 hover:bg-slate-100 hover:text-slate-950{% endif %}"
+                       href="/scene"
+                       {% if active_page == 'scene' %}aria-current="page"{% endif %}>Escena</a>
+                </div>
+            </nav>
+        </header>
+        <main class="mx-auto w-full max-w-5xl px-4 py-12 sm:py-16">
+            {% block content %}{% endblock %}
+        </main>
+    </body>
+</html>

@@ -41,7 +41,10 @@ GENERATED_TTL_SECONDS=3600
 just start
 just test
 just check
+just css
 ```
+
+`just css` builds `static/styles.css` from Tailwind CSS v4 using the pinned standalone CLI in `shell.nix`. Nix is only required when rebuilding styles; the generated stylesheet is served directly by the app.
 
 ## TODO
 
