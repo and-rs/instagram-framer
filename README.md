@@ -45,6 +45,47 @@ just check
 
 ## TODO
 
+### Foundation
+
+- [ ] Accept standard image formats and Nikon `.NEF` RAW files.
+- [ ] Decode uploads, apply EXIF orientation, and create a normalized working image.
+- [ ] Let the user select the Scene, Detail, or Documentation recipe before processing.
 - [ ] Improve job persistence if the app is used with multiple instances or restarts.
+
+### Automated detection
+
+- [ ] Detect the painting and estimate its bounds.
+- [ ] Detect four painting corners for the Documentation recipe.
+- [ ] Measure detection confidence and clearly surface failures.
+- [ ] Automate Scene cropping around the painting and intentional environment.
+
+### Image adjustments
+
+- [ ] Define a reliable adjustment pipeline for white balance, exposure, lighting, and color.
+- [ ] Evaluate a vision model that returns structured adjustment values for the tuning tools; it must not generate or alter image content.
+- [ ] Ensure adjustments preserve the painting's visual fidelity.
+
+### Scene recipe
+
+- [ ] Detect the painting and correct rotation only when needed.
+- [ ] Produce a balanced, full-bleed 1:1 crop with the painting and its environment.
+- [ ] Do not apply framing.
+
+### Detail recipe
+
+- [ ] Preserve the full horizontal detail image without cropping.
+- [ ] Tune the image and apply the existing square framing treatment.
+
+### Documentation recipe
+
+- [ ] Detect painting corners, correct perspective, and crop to the exact painting bounds.
+- [ ] Apply image adjustments.
+- [ ] Always apply the existing square framing treatment for a consistent 1:1 output.
+
+### Later
+
+- [ ] Add optional reference-style matching.
+- [ ] Add manual crop and corner-adjustment tools where automation is insufficient.
 - [ ] Add manual caption editing before downloading.
 - [ ] Revisit carousel ordering UX later.
+- [ ] Restore Instagram publishing once the image-preparation workflow is established.
