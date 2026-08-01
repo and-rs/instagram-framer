@@ -94,7 +94,6 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "fastapi" },
-    { name = "httpx" },
     { name = "jinja2" },
     { name = "openai" },
     { name = "pillow" },
@@ -111,7 +110,6 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi" },
-    { name = "httpx" },
     { name = "jinja2" },
     { name = "openai" },
     { name = "pillow" },

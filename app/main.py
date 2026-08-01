@@ -14,7 +14,6 @@ from fastapi.templating import Jinja2Templates
 from app.captioning import generate_caption
 from app.config import settings
 from app.image_processing import ImageProcessingError, frame_image_bytes
-from app.instagram import InstagramError, publish_carousel
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -105,16 +104,6 @@ async def process(
     )
 
 
-@app.post("/publish", response_class=HTMLResponse)
-async def publish(request: Request, job_id: Annotated[str, Form()]):
-    publish_result, publish_error = await _publish_job(request, job_id)
-    return templates.TemplateResponse(
-        request=request,
-        name="partials/publish_status.html",
-        context={"publish_result": publish_result, "publish_error": publish_error},
-    )
-
-
 @app.get("/generated/{job_id}/{filename}")
 async def generated(job_id: str, filename: str):
     if not _safe_job_id(job_id) or not _safe_filename(filename):
@@ -164,8 +153,6 @@ def _result(
     caption: str = "",
     warning: str | None = None,
     error: str | None = None,
-    publish_result: dict | None = None,
-    publish_error: str | None = None,
 ):
     image_items = []
     if job_id and filenames:
@@ -187,27 +174,8 @@ def _result(
             "warning": warning,
             "error": error,
             "download_all_url": request.url_for("download_all", job_id=job_id) if job_id and filenames else None,
-            "publish_result": publish_result,
-            "publish_error": publish_error,
         },
     )
-
-
-async def _publish_job(request: Request, job_id: str) -> tuple[dict | None, str | None]:
-    job = jobs.get(job_id)
-    if not job:
-        return None, "El trabajo no existe o expiró. Procesa las imágenes nuevamente."
-
-    base_url = (settings.public_base_url or str(request.base_url)).rstrip("/")
-    image_urls = [
-        f"{base_url}{request.url_for('generated', job_id=job_id, filename=filename).path}"
-        for filename in job["filenames"]
-    ]
-
-    try:
-        return await publish_carousel(image_urls, job["caption"]), None
-    except InstagramError as exc:
-        return None, str(exc)
 
 
 def _generated_image_path(job_id: str, filename: str) -> Path:

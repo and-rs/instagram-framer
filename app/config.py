@@ -12,9 +12,6 @@ class Settings(BaseSettings):
 
     openai_api_key: str | None = Field(default=None, alias="OPENAI_API_KEY")
     openai_model: str = Field(default="gpt-4o-mini", alias="OPENAI_MODEL")
-    instagram_access_token: str | None = Field(default=None, alias="INSTAGRAM_ACCESS_TOKEN")
-    instagram_user_id: str | None = Field(default=None, alias="INSTAGRAM_USER_ID")
-    public_base_url: str | None = Field(default=None, alias="PUBLIC_BASE_URL")
     frame_background: str = Field(default="#f7f3ea", alias="FRAME_BACKGROUND")
     frame_shadow_opacity: float = Field(default=0.22, alias="FRAME_SHADOW_OPACITY")
     generated_ttl_seconds: int = Field(default=3600, alias="GENERATED_TTL_SECONDS")
@@ -22,7 +19,6 @@ class Settings(BaseSettings):
     max_upload_mb: int = Field(default=50, alias="MAX_UPLOAD_MB")
     max_output_mb: int = Field(default=8, alias="MAX_OUTPUT_MB")
     generated_dir: Path = Path("generated")
-    graph_api_version: str = "v20.0"
 
     @field_validator("generated_ttl_seconds", "max_upload_count", "max_upload_mb", "max_output_mb", mode="before")
     @classmethod

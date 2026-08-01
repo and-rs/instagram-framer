@@ -3,7 +3,6 @@ uvicorn[standard]
 jinja2
 python-multipart
 pillow
-httpx
 openai
 pydantic-settings
 pytest
