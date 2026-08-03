@@ -363,5 +363,7 @@ def _extract_response_text(response: Any) -> str:
 
 
 def _safe_error(exc: Exception) -> str:
-    message = str(exc).replace(settings.openai_api_key or "", "[redacted]")
+    message = str(exc)
+    if settings.openai_api_key:
+        message = message.replace(settings.openai_api_key, "[redacted]")
     return f"{type(exc).__name__}: {message[:500]}"
