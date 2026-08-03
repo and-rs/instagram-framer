@@ -1,4 +1,4 @@
-<div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+<div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm" data-caption-result>
     {% if warning %}
         <div class="mb-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{{ warning }}</div>
     {% endif %}
@@ -18,10 +18,17 @@
             <a class="inline-flex items-center justify-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-slate-800"
                href="{{ download_all_url }}">Descargar todo en ZIP</a>
         </div>
-        <h3 class="mt-6 text-sm font-semibold">Caption</h3>
-        <div class="mt-2 rounded-md border border-slate-200 bg-slate-50 p-4 text-sm leading-6 whitespace-pre-wrap text-slate-700">
-            {{ caption }}
+        <div class="mt-6 flex items-center justify-between gap-3">
+            <h3 class="text-sm font-semibold">Caption</h3>
+            <button class="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    type="button"
+                    data-copy-caption>Copiar caption</button>
         </div>
+        <div class="mt-2 rounded-md border border-slate-200 bg-slate-50 p-4 text-sm leading-6 whitespace-pre-wrap text-slate-700" data-caption-text>{{ caption }}</div>
+        {% if description %}
+            <h3 class="mt-5 text-sm font-semibold">Descripción de la obra</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-700">{{ description }}</p>
+        {% endif %}
         <div class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {% for image in images %}
                 <figure class="overflow-hidden rounded-lg border border-slate-200">

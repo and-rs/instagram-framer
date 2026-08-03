@@ -1,7 +1,7 @@
 {% extends "base.jinja" %}
 {% block head %}
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-    <script src="{{ url_for("static", path = "app.js") }}" defer></script>
+    <script src="{{ url_for("static", path = "app.js") }}?v=caption-copy-3" defer></script>
 {% endblock %}
 {% block content %}
     <div class="max-w-2xl">
@@ -21,10 +21,42 @@
             <input class="block w-full cursor-pointer rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 file:mr-4 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200"
                    type="file"
                    name="images"
+                   data-artwork-images
                    accept="image/*"
                    multiple
                    required>
             <span class="text-sm font-normal text-slate-500">Hasta {{ max_upload_count }} imágenes, {{ max_upload_mb }} MB cada una.</span>
+        </label>
+        <fieldset class="mb-5 grid gap-3" data-reference-picker>
+            <legend class="text-sm font-medium">Imagen de referencia</legend>
+            <p class="text-sm text-slate-500">Esta imagen se enviará al modelo para proponer la colección, describir la obra y redactar el caption.</p>
+            <p class="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600" data-reference-empty>Selecciona una o más imágenes arriba para verlas aquí y elegir la referencia.</p>
+            <div class="grid grid-cols-2 gap-3" data-reference-options></div>
+        </fieldset>
+        <label class="mb-5 grid gap-2 text-sm font-medium">
+            Número de obra
+            <input class="rounded-md border border-slate-200 px-3 py-2 text-sm shadow-sm outline-none placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                   type="text"
+                   name="artwork_number"
+                   placeholder="12"
+                   required>
+        </label>
+        <label class="mb-5 grid gap-2 text-sm font-medium">
+            Nombre de la colección
+            <input class="rounded-md border border-slate-200 px-3 py-2 text-sm shadow-sm outline-none placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                   type="text"
+                   name="collection_name"
+                   data-collection-name
+                   placeholder="Opcional">
+            <span class="text-sm font-normal text-slate-500">Si lo indicas, se omite la selección de nombres generados.</span>
+        </label>
+        <label class="mb-5 grid gap-2 text-sm font-medium">
+            Descripción de la colección
+            <textarea class="min-h-24 resize-y rounded-md border border-slate-200 px-3 py-2 text-sm shadow-sm outline-none placeholder:text-slate-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                      name="collection_description"
+                      data-collection-description
+                      placeholder="Obligatoria solo si necesitas generar el nombre de la colección."></textarea>
+            <span class="text-sm font-normal text-slate-500">Describe brevemente el concepto o tema para recibir cinco propuestas de nombre.</span>
         </label>
         <label class="mb-5 grid gap-2 text-sm font-medium">
             Título de la obra
@@ -61,7 +93,7 @@
             <span id="process-indicator"
                   class="htmx-indicator inline-flex items-center gap-2 text-sm text-slate-500 transition-opacity"
                   data-loading-status
-                  data-stages="Subiendo imágenes|Enmarcando y optimizando|Generando caption|Preparando descarga">
+                  data-stages="Subiendo imágenes|Enmarcando y optimizando|Preparando colección|Generando caption">
                 <span class="size-4 animate-spin rounded-full border-2 border-slate-200 border-t-slate-700"
                       aria-hidden="true"></span>
                 <span data-stage>Preparando…</span>

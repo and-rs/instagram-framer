@@ -1,0 +1,9 @@
+{% if warning %}
+    <p class="text-sm text-amber-800">{{ warning }}</p>
+{% endif %}
+{% for option in options %}
+    <label class="flex cursor-pointer items-center gap-3 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:border-slate-400">
+        <input type="radio" name="collection_name" value="{{ option }}" {% if loop.first %}required{% endif %}>
+        <span>{{ option }}</span>
+    </label>
+{% endfor %}
