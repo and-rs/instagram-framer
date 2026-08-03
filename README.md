@@ -1,27 +1,46 @@
 # Framer
 
-FastAPI + HTMX app for preparing artwork images for Instagram.
+Framer prepares finished artwork photographs for social posts and future sales channels.
 
-## Current status
+## QOL todos
 
-### Framing workflow: working
+- [ ] Merge the nix files into only shell.nix.
+- [ ] Preserve state even after reload.
+- [ ] Think of way to insert a small flow before processing the framing, in which the user can select one of the uploaded photos and apply some edits with a common set of sliders, and then frame the edited one instead of the original.
+- [ ] Setup proper project formatting with reasonable TBD JS, HTML, CSS, Python and Jinja tooling.
+  - [ ] Should happen on precommit and there need to be automated scripts to do so.
+- [ ] Rethink the need for JS files and if can we use a more structured library that would fit the use case better.
+- [ ] For some reason the CSS file has a bunch or redefined css classes from Tailwind, it should be compact, follow a shadcn example, and stardadize colors, ratios and styles, not redefined library baselines.
+- [ ] We should have a regular global.css file that can be user modified, and then a different minified output.css that actually gets loaded by FastAPI/HTMX.
 
-1. Upload one or more standard artwork images.
-2. Enter the technique/material and dimensions.
-3. Generate `2000x2000` JPEGs and a Spanish caption.
-4. Review the images and caption, then download a ZIP.
+## Current Workflow
 
-Non-square images receive the existing framing treatment; square images are exported full bleed. This remains the active production workflow while Scene is built separately.
+1. Photograph and edit the artwork into its desired scenarios outside Framer.
+2. Upload the prepared images to Framer and select one reference image.
+3. Enter the artwork number, material, dimensions, and collection information.
+4. Generate framed `2000x2000` JPEGs, an artwork description, and a Spanish caption.
+5. Review and download the post-ready assets.
 
-### Scene workflow: planned
+Non-square images receive the framing treatment; square images are exported full bleed.
 
-`/scene` currently documents the recipe only. It does not accept or process uploads yet.
+## Scope
 
-The first Scene release produces a balanced, full-bleed `2000x2000` crop of an artwork in its environment. It preserves meaningful supporting objects and intentional negative space rather than isolating or centering the painting.
+Framer is a final QA and publishing-preparation tool. It does not perform RAW development, automatic scene composition, crop automation, perspective correction, or model-driven image edits.
 
-## Development setup
+The intended wider workflow is:
 
-Python dependencies are managed exclusively with `uv` through `pyproject.toml` and `uv.lock`.
+`create painting -> photograph painting -> edit into scenarios -> Framer QA/frame/caption -> Instagram and ecommerce`
+
+## Product Roadmap
+
+- [ ] Design per-image optional QA adjustments before framing: exposure, temperature, contrast, highlights, shadows, and vibrance.
+- [ ] Preserve durable artwork records, source photographs, scenario edits, Framer exports, captions, and adjustment history.
+- [ ] Create ecommerce product records from archived artwork data.
+- [ ] Add an approval queue and later scheduled Instagram publishing.
+
+## Development
+
+Dependencies are managed with `uv` through `pyproject.toml` and `uv.lock`.
 
 ```bash
 uv sync
@@ -29,10 +48,6 @@ just start
 ```
 
 Open <http://127.0.0.1:8000>.
-
-`requirements.txt` is intentionally not used.
-
-## Commands
 
 ```bash
 just start
@@ -42,86 +57,6 @@ just css
 just css-watch
 ```
 
-`just css` builds the committed `static/styles.css` from `static/tailwind.css`. It uses Tailwind CSS v4's pinned standalone CLI through `shell.nix`; Nix is required only to rebuild styles, not to run the application.
+`just css` builds `static/styles.css` from `static/tailwind.css`. Nix is required only to rebuild styles.
 
-## Environment variables
-
-```text
-OPENAI_API_KEY=...
-OPENAI_MODEL=gpt-4o-mini
-FRAME_BACKGROUND=#f7f3ea
-FRAME_SHADOW_OPACITY=0.22
-MAX_UPLOAD_COUNT=10
-MAX_UPLOAD_MB=50
-MAX_OUTPUT_MB=20
-MAX_IMAGE_PIXELS=120000000
-GENERATED_TTL_SECONDS=3600
-```
-
-The frame settings belong to the active framing workflow. Scene-specific settings will be introduced alongside their implementation rather than documented in advance.
-
-## Scene implementation record
-
-| Stage | Status | Evidence required before enabling |
-| --- | --- | --- |
-| Decode and normalize | Planned | Raster and NEF fixtures, EXIF-orientation tests, invalid-upload handling |
-| Composition analysis | Planned | Structured response validation, positive/negative scene fixtures, confidence and failure reporting |
-| Full-resolution crop | Planned | Approved 1:1 fixture crops that retain the artwork, context, and negative space |
-| Color and lighting | Planned | Bounded adjustment tests, before/after review, recorded applied values |
-| Export and audit | Planned | `2000x2000` output assertions and per-job analysis/transform manifest |
-| Straightening | Deferred | Separate evaluation showing rotation improves Scene images without harming composition |
-
-An implemented stage is not considered working because code exists alone. It must have the listed test evidence, user-visible behavior, and a recorded limitation or failure path.
-
-## Scene subplan
-
-### 1. Decode and normalize
-
-- Accept standard raster images and Nikon `.NEF` RAW files.
-- Apply EXIF orientation and create a full-resolution normalized working image.
-- For NEF, decode locally before analysis. Create a downscaled JPEG analysis preview, but retain the full-resolution decoded image for final processing.
-- Store input type, decoder, dimensions, and normalization result in the Scene job manifest.
-
-Why: OpenAI vision analysis consumes a rendered image preview, not raw NEF bytes. Local decoding keeps the final crop and adjustments at full resolution.
-
-### 2. Structured composition analysis
-
-- Send the downscaled preview to the existing OpenAI integration with Structured Outputs.
-- Request primary artwork bounds, supporting subjects, intentional negative space, a proposed square crop, confidence, diagnostics, and bounded color/lighting values.
-- Validate every coordinate and value deterministically before processing.
-- Return an explicit low-confidence or ambiguous result rather than choosing a crop silently.
-
-Why: the desired result is editorial composition, not rectangle detection. The painting, easel, vase, table, and empty wall may all be intentional. The model proposes structured coordinates and values only; it never generates or edits image content.
-
-### 3. Full-resolution 1:1 composition
-
-- Apply the validated square crop to the full-resolution normalized image.
-- Preserve the primary artwork while allowing off-center placement, supporting objects, and meaningful negative space.
-- Produce a preview before export.
-- Do not call the framing pipeline or add a frame/shadow.
-
-Why: a centered crop around detected artwork would destroy the intended composition. Applying the crop at full resolution avoids quality loss from the analysis preview.
-
-### 4. Color and lighting adjustments
-
-- Apply deterministic, conservative full-resolution white balance, exposure, tone, and color adjustments from the validated structured response.
-- Use RAW white balance during NEF development where possible; use bounded RGB/tone adjustments for raster inputs.
-- Save the exact applied values and show unadjusted and adjusted previews.
-
-Why: the model provides aesthetic guidance, while deterministic bounded transforms preserve fidelity and make every output auditable. No adjustment may generate, remove, or invent image content.
-
-### 5. Export and audit record
-
-- Export an optimized `2000x2000` full-bleed JPEG.
-- Store the structured response, validation outcome, crop coordinates in normalized-source pixels, applied adjustments, model/version, and failure reason in a per-job manifest.
-
-Why: Scene automation will sometimes be wrong. An audit record makes results reproducible, debuggable, and safe to revise without losing context.
-
-## Deferred work
-
-- Automatic straightening. It is not needed for the initial Scene composition target and can introduce unnecessary resampling.
-- Manual crop and corner-adjustment tools.
-- Detail and Documentation recipes.
-- Perspective correction. This is Documentation-only because Scene should preserve its photographed environment.
-- Multi-instance job persistence.
-- Instagram publishing.
+Environment variable examples are in `.env.example`.

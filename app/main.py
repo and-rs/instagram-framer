@@ -14,10 +14,8 @@ from fastapi.templating import Jinja2Templates
 from app.captioning import CaptionGenerationError, generate_caption, generate_collection_names
 from app.config import settings
 from app.image_processing import ImageProcessingError, frame_image_bytes
-from app.scene import router as scene_router
 
 app = FastAPI()
-app.include_router(scene_router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
