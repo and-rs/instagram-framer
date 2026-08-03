@@ -1,5 +1,6 @@
 from io import BytesIO
 from pathlib import Path
+import warnings
 
 from PIL import Image, ImageColor, ImageFilter, ImageOps, UnidentifiedImageError
 
@@ -16,13 +17,26 @@ class ImageProcessingError(ValueError):
 
 def _load_image(data: bytes) -> Image.Image:
     try:
-        image = Image.open(BytesIO(data))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", Image.DecompressionBombWarning)
+            image = Image.open(BytesIO(data))
+        _validate_image_pixels(image)
         image.verify()
-        image = Image.open(BytesIO(data))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", Image.DecompressionBombWarning)
+            image = Image.open(BytesIO(data))
+        _validate_image_pixels(image)
         image = ImageOps.exif_transpose(image)
         return image.convert("RGBA")
-    except (UnidentifiedImageError, OSError) as exc:
+    except (Image.DecompressionBombError, UnidentifiedImageError, OSError) as exc:
         raise ImageProcessingError("El archivo subido no es una imagen válida") from exc
+
+
+def _validate_image_pixels(image: Image.Image) -> None:
+    if image.width * image.height > settings.max_image_pixels:
+        raise ImageProcessingError(
+            f"La imagen supera el límite de {settings.max_image_pixels:,} píxeles."
+        )
 
 
 def _flatten(
@@ -76,17 +90,17 @@ def _shadow_alpha() -> int:
 
 def _save_jpeg(image: Image.Image, output_path: Path) -> None:
     max_bytes = settings.max_output_mb * 1024 * 1024
-    last_buffer = BytesIO()
 
-    for quality in (92, 88, 84, 80, 76, 72, 68, 64, 60, 56, 52):
+    for quality in range(92, 19, -4):
         buffer = BytesIO()
         image.save(buffer, "JPEG", quality=quality, optimize=True, progressive=True)
         if buffer.tell() <= max_bytes:
             output_path.write_bytes(buffer.getvalue())
             return
-        last_buffer = buffer
 
-    output_path.write_bytes(last_buffer.getvalue())
+    raise ImageProcessingError(
+        "El resultado supera MAX_OUTPUT_MB incluso con la compresión mínima permitida."
+    )
 
 
 def _frame_background() -> tuple[int, int, int]:
