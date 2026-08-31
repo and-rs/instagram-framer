@@ -323,8 +323,10 @@ def _build_caption_prompt(
         [
             "Redacta contenido de Instagram en español para vender una obra de arte original.",
             "Examina la imagen adjunta y los datos de la obra.",
-            "Devuelve una descripción breve de la pintura: un solo párrafo sobrio de dos o tres oraciones, basado solo en lo visible y los datos proporcionados.",
-            "Describe únicamente elementos observables: objetos, formas, disposición, colores, superficies y técnica visible. No interpretes símbolos, emociones, atmósferas, movimiento, intenciones ni estilos; evita adjetivos abstractos o poéticos.",
+            "Devuelve una descripción breve de la pintura: un solo párrafo de dos oraciones y un máximo de 30 palabras, fiel a la imagen y a los datos proporcionados.",
+            "Escribe como el artista que presenta su obra en Instagram, no como un crítico. Empieza de forma directa, por ejemplo con 'Hoy comparto...', nombra el motivo principal con palabras cotidianas y menciona solo un rasgo distintivo.",
+            "Evita análisis formales y expresiones como 'masas oscuras', 'franja luminosa', 'atmósfera' o 'genera sensación'. No enumeres colores ni describas cada zona; no inventes simbolismos, historias ni intenciones.",
+            "La segunda oración debe ser únicamente un cierre sencillo basado en 'Espero que te guste' u 'Ojalá te guste'. No uses 'disfrutes', 'conecte contigo' ni variantes solemnes.",
             "Devuelve también el caption final. Debe incluir esa descripción literalmente como su segundo párrafo.",
             "Primera línea del caption: colección y número de obra, seguidos de título, material/técnica y medidas cuando existan, separados por |.",
             "Si no se proporciona título, omítelo por completo: no inventes un título ni uses 'Sin título', 'Untitled' o equivalentes.",

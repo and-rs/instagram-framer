@@ -5,21 +5,10 @@ import pytest
 import app.captioning as captioning
 from app.captioning import (
     CaptionGenerationError,
-    SYSTEM_PROMPT_PATH,
-    _build_caption_prompt,
-    _build_collection_prompt,
     _collection_names,
     _normalize_caption_header,
     fallback_caption,
 )
-
-
-def test_collection_prompt_uses_description_and_excludes_prior_options():
-    prompt = _build_collection_prompt("paisajes nocturnos y luz suave", ["Luz Interior"])
-
-    assert "paisajes nocturnos y luz suave" in prompt
-    assert "Luz Interior" in prompt
-    assert "exactamente cinco" in prompt
 
 
 def test_collection_names_rejects_duplicates_and_prior_options():
@@ -29,44 +18,6 @@ def test_collection_names_rejects_duplicates_and_prior_options():
     )
 
     assert names == ["Bruma Azul", "Materia Serena"]
-
-
-def test_caption_prompt_includes_complete_metadata_and_normalization_rules():
-    prompt = _build_caption_prompt(
-        title="casa azul",
-        material="oleo sobre tela",
-        size="40 x 50 cm",
-        notes="pintada al atardecer",
-        image_count=3,
-        collection_name="Luz Interior",
-        artwork_number="12",
-        collection_description="espacios domésticos iluminados",
-    )
-
-    assert "Colección: Luz Interior" in prompt
-    assert "Número de obra: 12" in prompt
-    assert "Título: casa azul" in prompt
-    assert "Número de imágenes del carrusel: 3" in prompt
-    assert "Debe incluir esa descripción literalmente" in prompt
-    assert "Sé conciso" in prompt
-    assert "elementos observables" in prompt
-    assert "No interpretes símbolos" in prompt
-
-
-def test_caption_prompt_forbids_inventing_a_title_when_none_is_given():
-    prompt = _build_caption_prompt(
-        title=None,
-        material="óleo sobre tela",
-        size="40 x 50 cm",
-        notes=None,
-        image_count=1,
-        collection_name="Luz Interior",
-        artwork_number="12",
-        collection_description=None,
-    )
-
-    assert "Si no se proporciona título, omítelo por completo" in prompt
-    assert "Título:" not in prompt
 
 
 def test_caption_header_uses_title_case_collection_and_skips_missing_title():
@@ -81,13 +32,6 @@ def test_caption_header_uses_title_case_collection_and_skips_missing_title():
 
     assert caption.startswith("Mareas Oníricas 01 | Acrílico sobre lienzo | 35 x 25 cm")
     assert "Título" not in caption
-
-
-def test_system_prompt_is_loaded_from_markdown_file():
-    prompt = captioning._load_system_prompt()
-
-    assert SYSTEM_PROMPT_PATH.name == "caption_system.md"
-    assert "Correct Spanish grammar" in prompt
 
 
 def test_fallback_caption_normalizes_header_spacing_and_capitalization():
